@@ -1,34 +1,53 @@
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+# Nightly smoke test workflow
+# Runs daily at 8:10 PM Central Standard Time (CST, UTC-6) -> 02:10 UTC next day
+# NOTE: GitHub schedule uses UTC and is NOT DST-aware. If you require DST handling (CDT), see notes below.
+on:
+  schedule:
+    # 20:10 CST (UTC-6) -> 02:10 UTC
+    - cron: '10 2 * * *'
+  workflow_dispatch: {}    # allow manual runs
 
-  - name: Set up JDK 11
-    uses: actions/setup-java@v4
-    with:
-      distribution: temurin
-      java-version: '11'
-      cache: 'maven'
+name: Nightly Smoke Tests - 8:10 PM CST
 
-  - name: Cache Maven repository (additional layer)
-    uses: actions/cache@v4
-    with:
-      path: ~/.m2/repository
-      key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-      restore-keys: |
-        ${{ runner.os }}-maven-
+permissions:
+  contents: read
 
-  - name: Run smoke tests
-    env:
-      MAVEN_OPTS: -Xmx2G
-    run: mvn clean compile test -Dcucumber.filter.tags=@smoke
+jobs:
+  smoke-tests:
+    name: Run smoke test suite
+    runs-on: ubuntu-latest
 
-  - name: Upload Surefire / Cucumber reports
-    if: always()
-    uses: actions/upload-artifact@v4
-    with:
-      name: test-reports
-      path: |
-        target/surefire-reports
-        target/failsafe-reports
-        target/cucumber-reports
-        target/*.xml
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: 'maven'
+
+      - name: Cache Maven repository (additional layer)
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Run smoke tests
+        env:
+          MAVEN_OPTS: -Xmx2G
+        run: mvn clean compile test -Dcucumber.filter.tags=@smoke
+
+      - name: Upload Surefire / Cucumber reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            target/surefire-reports
+            target/failsafe-reports
+            target/cucumber-reports
+            target/*.xml
