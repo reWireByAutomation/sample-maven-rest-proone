@@ -4,7 +4,7 @@
 on:
   schedule:
     # 20:10 CST (UTC-6) -> 02:10 UTC
-    - cron: '10 2 * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch: {}    # allow manual runs
 
 name: Nightly Smoke Tests - 8:10 PM CST
