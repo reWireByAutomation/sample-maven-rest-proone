@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="RestAssured Automation Suite" verbose="1">
+    <test name="Rest API Tests">
+        <classes>
+            <class name="org.automation.poc.TestRunner"/>
+        </classes>
+    </test>
+</suite>
