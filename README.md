@@ -1,4 +1,4 @@
-# REST API Testing POC
+# REST API Testing POC 1.0
 
 This repository is a proof-of-concept automation framework for REST API testing built with:
 
